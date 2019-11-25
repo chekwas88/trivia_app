@@ -57,6 +57,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(payload['success'], True)
         self.assertTrue(payload['categories'])
         self.assertTrue(payload['total_categories'])
+
     
     def test_retrieve_questions(self):
         res = self.client().get('/api/questions')
@@ -68,6 +69,34 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(payload['current_category'])
         self.assertTrue(payload['categories'])
         self.assertTrue(payload['total_questions'])
+
+    def test_create_question(self):
+        res = self.client().post('/api/questions',  json={
+            'question': 'Which genre does coldplay perform?',
+            'answer': 'alternative',
+            'category': '4',
+            'difficulty': 4
+        })
+        payload = json.loads(res.data)
+        
+        self.assertEqual(res.status_code, 201)
+        self.assertEqual(payload['success'], True)
+        self.assertTrue(payload['created'])
+        self.assertTrue(payload['total_questions'])
+
+    def test_create_question_error(self):
+        res = self.client().post('/api/questions',  json={
+            'question': 'Which genre does coldplay perform?',
+            'answer': 'alternative',
+            'category': '4',
+            'difficulty': 4
+        })
+        payload = json.loads(res.data)
+        
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(payload['message'], 'unprocessable')
+        self.assertEqual(payload['error'], 422)
+        self.assertTrue(payload['success'], False)
 
 # Make the tests conveniently executable
 if __name__ == "__main__":

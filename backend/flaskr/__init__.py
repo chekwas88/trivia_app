@@ -22,7 +22,7 @@ def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
     setup_db(app)
-    CORS(app, resources={r'/api/*': {'origins': '*'}})
+    CORS(app, resources={r'/*api/*': {'origins': '*'}})
     
     # CORS Headers 
     @app.after_request
@@ -103,6 +103,26 @@ def create_app(test_config=None):
     the form will clear and the question will appear at the end of the last page
     of the questions list in the "List" tab.  
     '''
+
+    @app.route('/api/questions', methods=['POST'])
+    def create_question():
+        try:
+            body = request.get_json()
+            question = body.get('question', None)
+            answer = body.get('answer', None)
+            difficulty = body.get('difficulty', None)
+            category = body.get('category', None)
+            new_question = Question(question=question, answer=answer, difficulty=difficulty, category=category)
+            new_question.insert()
+
+            return jsonify({
+                'success': True,
+                'created': new_question.id,
+                'total_questions': len(Question.query.all())
+            }), 201
+
+        except:
+            abort(422)
 
     '''
     @TODO: 
