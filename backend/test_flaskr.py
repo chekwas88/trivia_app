@@ -25,6 +25,21 @@ class TriviaTestCase(unittest.TestCase):
             self.db.init_app(self.app)
             # create all tables
             self.db.create_all()
+            question1 = Question(
+                question="La Giaconda is better known as what?",
+                answer="Mona Lisa",
+                category="2",
+                difficulty=2
+            )
+
+            question2 = Question(
+                question="How many paintings did Van Gogh sell in his lifetime?",
+                answer="one",
+                category="2",
+                difficulty=3
+            )
+            self.db.session.add_all([question1, question2])
+            self.db.session.commit()
     
     def tearDown(self):
         """Executed after reach test"""
@@ -42,6 +57,17 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(payload['success'], True)
         self.assertTrue(payload['categories'])
         self.assertTrue(payload['total_categories'])
+    
+    def test_retrieve_questions(self):
+        res = self.client().get('/api/questions')
+        payload = json.loads(res.data)
+        
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(payload['success'], True)
+        self.assertTrue(payload['questions'])
+        self.assertTrue(payload['current_category'])
+        self.assertTrue(payload['categories'])
+        self.assertTrue(payload['total_questions'])
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
