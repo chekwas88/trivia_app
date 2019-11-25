@@ -12,26 +12,39 @@ def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
     setup_db(app)
-    CORS(app, resources={r'*/api/*': {'origins': '*'}})
+    CORS(app, resources={r'/api/*': {'origins': '*'}})
     
-    '''
-    @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
-    '''
-
-    '''
-    @TODO: Use the after_request decorator to set Access-Control-Allow
-    '''
     # CORS Headers 
     @app.after_request
     def after_request(response):
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
-        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization, true')
+        response.headers.add('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS')
         return response
+
     '''
     @TODO: 
     Create an endpoint to handle GET requests 
     for all available categories.
     '''
+    @app.route('/api')
+    def index(): 
+        return jsonify({
+            'greeting': 'Welcome'
+        })
+    #get all categories
+    @app.route('/api/categories')
+    def retrieve_categories():
+        try:
+            categories = Category.query.all()
+            formatted_categories = [category.format() for category in categories]
+            return jsonify({
+                'success': True,
+                'categories': formatted_categories,
+                'total_categories': len(Category.query.all())
+            }), 200
+        except:
+            abort(422)
+
 
 
     '''
@@ -104,7 +117,14 @@ def create_app(test_config=None):
     Create error handlers for all expected errors 
     including 404 and 422. 
     '''
+    @app.errorhandler(422)
+    def unprocessable(error):
+        return jsonify({
+        "success": False, 
+        "error": 422,
+        "message": "unprocessable"
+        }), 422
+
     
     return app
-
-        
+    
