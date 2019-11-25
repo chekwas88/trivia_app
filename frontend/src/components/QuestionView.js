@@ -12,7 +12,7 @@ class QuestionView extends Component {
       questions: [],
       page: 1,
       totalQuestions: 0,
-      categories: {},
+      categories: [],
       currentCategory: null,
     }
   }
@@ -21,9 +21,13 @@ class QuestionView extends Component {
     this.getQuestions();
   }
 
+  // componentDidUpdate(){
+  //   this.getQuestions();
+  // }
+
   getQuestions = () => {
     $.ajax({
-      url: `/api/questions?page=${this.state.page}`, //TODO: update request URL
+      url: `http://127.0.0.1:5000/api/questions?page=${this.state.page}`, //TODO: update request URL
       type: "GET",
       success: (result) => {
         console.log(result)
@@ -31,7 +35,7 @@ class QuestionView extends Component {
           questions: result.questions,
           totalQuestions: result.total_questions,
           categories: result.categories,
-          currentCategory: result.current_category })
+          currentCategory: result.current_category.type })
         return;
       },
       error: (error) => {
@@ -121,18 +125,20 @@ class QuestionView extends Component {
   }
 
   render() {
+    console.log(this.state.categories)
     return (
+      
       <div className="question-view">
         <div className="categories-list">
           <h2 onClick={() => {this.getQuestions()}}>Categories</h2>
-          <ul>
-            {Object.keys(this.state.categories).map((id, ) => (
-              <li key={id} onClick={() => {this.getByCategory(id)}}>
-                {this.state.categories[id]}
-                <img className="category" src={`${this.state.categories[id]}.svg`}/>
+          {this.state.categories && <ul>
+            {this.state.categories.map((cat) => (
+              <li key={cat.id} onClick={() => {this.getByCategory(cat.id)}}>
+                {cat.type}
+                <img alt="category" className="category" src={`${cat.type}.svg`}/>
               </li>
             ))}
-          </ul>
+          </ul>}
           <Search submitSearch={this.submitSearch}/>
         </div>
         <div className="questions-list">
