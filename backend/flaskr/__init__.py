@@ -106,32 +106,37 @@ def create_app(test_config=None):
     def create_question():
         try:
             body = request.get_json()
-            question = body.get('question', None)
-            answer = body.get('answer', None)
-            difficulty = body.get('difficulty', None)
-            category = body.get('category', None)
-            new_question = Question(question=question, answer=answer, difficulty=difficulty, category=category)
-            new_question.insert()
+            search_term = body.get('searchTerm', None)
+            if search_term is not None:
+                questions_selection = Question.query.filter(Question.question.ilike('%{}%'.format(search_term))).all()
+                # category = db.session.query(Category).first()
+                current_questions = paginate_questions(request, questions_selection)
+                categories = Category.query.all()
+                formatted_categories = [category.format() for category in categories]
+                return jsonify({
+                   'success': True,
+                    'questions': current_questions,
+                    'total_questions': len(Question.query.all()),
+                    'categories': formatted_categories,
+                    'current_category': categories[0].format()
+                }), 200
+            else:
+                question = body.get('question', None)
+                answer = body.get('answer', None)
+                difficulty = body.get('difficulty', None)
+                category = body.get('category', None)
+                new_question = Question(question=question, answer=answer, difficulty=difficulty, category=category)
+                new_question.insert()
 
-            return jsonify({
-                'success': True,
-                'created': new_question.id,
-                'total_questions': len(Question.query.all())
-            }), 201
+                return jsonify({
+                    'success': True,
+                    'created': new_question.id,
+                    'total_questions': len(Question.query.all())
+                }), 201
 
         except:
             abort(422)
 
-    '''
-    @TODO: 
-    Create a POST endpoint to get questions based on a search term. 
-    It should return any questions for whom the search term 
-    is a substring of the question. 
-
-    TEST: Search by any phrase. The questions list will update to include 
-    only question that include that string within their question. 
-    Try using the word "title" to start. 
-    '''
 
     '''
     @TODO: 
@@ -155,11 +160,6 @@ def create_app(test_config=None):
     and shown whether they were correct or not. 
     '''
 
-    '''
-    @TODO: 
-    Create error handlers for all expected errors 
-    including 404 and 422. 
-    '''
     @app.errorhandler(422)
     def unprocessable(error):
         return jsonify({

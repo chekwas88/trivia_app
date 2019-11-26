@@ -78,16 +78,14 @@ class QuestionView extends Component {
 
   submitSearch = (searchTerm) => {
     $.ajax({
-      url: `/questions`, //TODO: update request URL
+      url: `http://127.0.0.1:5000/api/questions`, //TODO: update request URL
       type: "POST",
       dataType: 'json',
       contentType: 'application/json',
       data: JSON.stringify({searchTerm: searchTerm}),
-      xhrFields: {
-        withCredentials: true
-      },
       crossDomain: true,
       success: (result) => {
+        console.log(result)
         this.setState({
           questions: result.questions,
           totalQuestions: result.total_questions,
@@ -143,7 +141,7 @@ class QuestionView extends Component {
               key={q.id}
               question={q.question}
               answer={q.answer}
-              category={this.state.categories[q.category]} 
+              category={this.state.categories.filter(cat => cat.id === q.category)} 
               difficulty={q.difficulty}
               questionAction={this.questionAction(q.id)}
             />

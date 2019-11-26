@@ -127,6 +127,16 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(payload['error'], 404)
         self.assertEqual(payload['message'], 'Resource not found')
 
+    def test_search_questions(self):
+        res = self.client().post('/api/questions', json={'searchTerm': 'heaviest'})
+        payload = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(payload['success'], True)
+        self.assertTrue(payload['total_questions'])
+        self.assertTrue(payload['questions'])
+
+
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
