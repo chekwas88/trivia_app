@@ -12,7 +12,7 @@ class QuizView extends Component {
         quizCategory: null,
         previousQuestions: [], 
         showAnswer: false,
-        categories: {},
+        categories: [],
         numCorrect: 0,
         currentQuestion: {},
         guess: '',
@@ -22,7 +22,7 @@ class QuizView extends Component {
 
   componentDidMount(){
     $.ajax({
-      url: `api/categories`, //TODO: update request URL
+      url: `http://127.0.0.1:5000/api/categories`, //TODO: update request URL
       type: "GET",
       success: (result) => {
         this.setState({ categories: result.categories })
@@ -36,7 +36,9 @@ class QuizView extends Component {
   }
 
   selectCategory = ({type, id=0}) => {
+    console.log(id)
     this.setState({quizCategory: {type, id}}, this.getNextQuestion)
+    
   }
 
   handleChange = (event) => {
@@ -48,7 +50,7 @@ class QuizView extends Component {
     if(this.state.currentQuestion.id) { previousQuestions.push(this.state.currentQuestion.id) }
 
     $.ajax({
-      url: '/quizzes', //TODO: update request URL
+      url: 'http://127.0.0.1:5000/api/quizzes', //TODO: update request URL
       type: "POST",
       dataType: 'json',
       contentType: 'application/json',
@@ -56,9 +58,6 @@ class QuizView extends Component {
         previous_questions: previousQuestions,
         quiz_category: this.state.quizCategory
       }),
-      xhrFields: {
-        withCredentials: true
-      },
       crossDomain: true,
       success: (result) => {
         this.setState({
@@ -105,14 +104,14 @@ class QuizView extends Component {
               <div className="choose-header">Choose Category</div>
               <div className="category-holder">
                   <div className="play-category" onClick={this.selectCategory}>ALL</div>
-                  {Object.keys(this.state.categories).map(id => {
+                  {this.state.categories.map(cat => {
                   return (
                     <div
-                      key={id}
-                      value={id}
+                      key={cat.id}
+                      value={cat.id}
                       className="play-category"
-                      onClick={() => this.selectCategory({type:this.state.categories[id], id})}>
-                      {this.state.categories[id]}
+                      onClick={() => this.selectCategory({type: cat.type, id: cat.id})}>
+                      {cat.type}
                     </div>
                   )
                 })}

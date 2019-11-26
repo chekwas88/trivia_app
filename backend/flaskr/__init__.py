@@ -137,15 +137,6 @@ def create_app(test_config=None):
         except:
             abort(422)
 
-
-    '''
-    @TODO: 
-    Create a GET endpoint to get questions based on category. 
-
-    TEST: In the "List" tab / main screen, clicking on one of the 
-    categories in the left column will cause only questions of that 
-    category to be shown. 
-    '''
     @app.route('/api/categories/<int:category_id>/questions')
     def get_questions_based_on_category(category_id):
         category = Category.query.get(category_id)
@@ -174,6 +165,29 @@ def create_app(test_config=None):
     one question at a time is displayed, the user is allowed to answer
     and shown whether they were correct or not. 
     '''
+    @app.route('/api/quizzes', methods=['POST'])
+    def get_quizzes():
+        try:
+            body = request.get_json()
+            questions = Question.query.filter_by(
+                category=body.get("quiz_category")["id"]
+            ).filter(Question.id.notin_(body.get("previous_questions"))).all()
+
+            if body.get("quiz_category")["id"] == 0:
+                questions = Question.query.filter(
+                    Question.id.notin_(body.get("previous_questions"))).all()
+
+            question = None
+
+            if questions:
+                question = random.choice(questions).format()
+
+            return jsonify({
+                "success": True,
+                "question": question
+            }), 200
+        except:
+            abort(404)
 
     @app.errorhandler(422)
     def unprocessable(error):

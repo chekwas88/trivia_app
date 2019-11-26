@@ -154,7 +154,6 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().get('/api/categories/10000000000000/questions')
         self.assertEqual(res.status_code, 404)
 
-
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
