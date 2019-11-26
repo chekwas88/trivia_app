@@ -8,6 +8,10 @@
   flex-shrink: 2;
 }
 
+.linked-list {
+  cursor: pointer;
+}
+
 .categories-list > form {
   width: 60%;
 }
