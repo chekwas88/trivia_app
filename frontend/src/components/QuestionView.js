@@ -60,7 +60,7 @@ class QuestionView extends Component {
 
   getByCategory= (id) => {
     $.ajax({
-      url: `/categories/${id}/questions`, //TODO: update request URL
+      url: `http://127.0.0.1:5000/api/categories/${id}/questions`, //TODO: update request URL
       type: "GET",
       success: (result) => {
         this.setState({
@@ -126,7 +126,7 @@ class QuestionView extends Component {
           <h2 onClick={() => {this.getQuestions()}}>Categories</h2>
           {this.state.categories && <ul>
             {this.state.categories.map((cat) => (
-              <li key={cat.id} onClick={() => {this.getByCategory(cat.id)}}>
+              <li className="linked-list" key={cat.id} onClick={() => {this.getByCategory(cat.id)}}>
                 {cat.type}
                 <img alt="category" className="category" src={`${cat.type}.svg`}/>
               </li>

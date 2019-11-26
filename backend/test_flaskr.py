@@ -136,6 +136,24 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(payload['total_questions'])
         self.assertTrue(payload['questions'])
 
+    def test_get_question_based_on_categories(self):
+        with self.app.app_context():
+            self.db = SQLAlchemy()
+            self.db.init_app(self.app)
+            category = self.db.session.query(Category).filter(Category.type == 'Science').all()
+
+        res = self.client().get('/api/categories/{}/questions'.format(category[0].id))
+        payload = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(payload['success'], True)
+        self.assertTrue(payload['total_questions'])
+        self.assertTrue(payload['questions'])
+
+    def tes_questions_based_categories_error(self):
+        res = self.client().get('/api/categories/10000000000000/questions')
+        self.assertEqual(res.status_code, 404)
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
