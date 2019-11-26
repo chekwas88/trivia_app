@@ -21,16 +21,11 @@ class QuestionView extends Component {
     this.getQuestions();
   }
 
-  // componentDidUpdate(){
-  //   this.getQuestions();
-  // }
-
   getQuestions = () => {
     $.ajax({
       url: `http://127.0.0.1:5000/api/questions?page=${this.state.page}`, //TODO: update request URL
       type: "GET",
       success: (result) => {
-        console.log(result)
         this.setState({
           questions: result.questions,
           totalQuestions: result.total_questions,
@@ -110,9 +105,10 @@ class QuestionView extends Component {
     if(action === 'DELETE') {
       if(window.confirm('are you sure you want to delete the question?')) {
         $.ajax({
-          url: `/questions/${id}`, //TODO: update request URL
+          url: `http://127.0.0.1:5000/api/questions/${id}`, //TODO: update request URL
           type: "DELETE",
           success: (result) => {
+            console.log(result)
             this.getQuestions();
           },
           error: (error) => {
@@ -125,7 +121,6 @@ class QuestionView extends Component {
   }
 
   render() {
-    console.log(this.state.categories)
     return (
       
       <div className="question-view">
