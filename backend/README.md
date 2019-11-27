@@ -52,6 +52,8 @@ Setting the `FLASK_ENV` variable to `development` will detect file changes and r
 
 Setting the `FLASK_APP` variable to `flaskr` directs flask to use the `flaskr` directory and the `__init__.py` file to find the application. 
 
+The application runs on ```http://127.0.0.1:5000/```
+
 ## Tasks
 
 One note before you delve into your tasks: for each endpoint you are expected to define the endpoint and response data. The frontend will be a plentiful resource because it is set up to expect certain endpoints and response data formats already. You should feel free to specify endpoints in your own way; if you do so, make sure to update the frontend or you will get some unexpected behavior. 
@@ -66,35 +68,218 @@ One note before you delve into your tasks: for each endpoint you are expected to
 8. Create a POST endpoint to get questions to play the quiz. This endpoint should take category and previous question parameters and return a random questions within the given category, if provided, and that is not one of the previous questions. 
 9. Create error handlers for all expected errors including 400, 404, 422 and 500. 
 
-REVIEW_COMMENT
+
+
+### Frontend
+From the frontend folder run the following command:
+```npm install or yarn install``` to install the packages in package.json file.
+To run the application run ```npm start or yarn start```
+The application runs on ```http://127.0.0.1:3000/```
+
+### Tests
+To run tests navigate to backend folder and run the following commands:
 ```
-This README is missing documentation of your endpoints. Below is an example for your endpoint to get all categories. Please use it as a reference for creating your documentation and resubmit your code. 
-
-Endpoints
-GET '/categories'
-GET ...
-POST ...
-DELETE ...
-
-GET '/categories'
-- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
-- Request Arguments: None
-- Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs. 
-{'1' : "Science",
-'2' : "Art",
-'3' : "Geography",
-'4' : "History",
-'5' : "Entertainment",
-'6' : "Sports"}
-
+    createdb trivia_test
+    python test_flaskr.py
 ```
 
+## API Reference
+The base url for this API is ```http://127.0.0.1:5000/``` which serves as a proxy to the frontend. Currently the API is not hosted.
 
-## Testing
-To run the tests, run
+No Authentication or API key is needed.
+
+### Error handling
+Errors are returned in the following format:
 ```
-dropdb trivia_test
-createdb trivia_test
-psql trivia_test < trivia.psql
-python test_flaskr.py
+{
+    "success": False,
+    "error": 404/422/400,
+    "message": "error message"
+}
 ```
+### Endpoints
+
+***GET /api/categories***
+
+This returns a list of all categories.
+
+**sample return**
+```
+{
+    "success": True,
+    "categories": [
+        {
+            "id": 1,
+            "type": "Science"
+        },
+        {
+            "id": 2,
+            "type": "Art"
+        },
+        {
+            "id": 3,
+            "type": "History"
+        },
+        {
+            "id": 4,
+            "type": "Sport"
+        },
+        ...
+    ],
+    "total_categories": 5
+}
+```
+
+***GET /api/questions***
+
+This returns a list of questions stored in the database. The results are paginated in groups of 10.
+
+**Sample Return**
+
+```
+    {
+    "success": True,
+    "questions": [
+        {
+            "id": 1,
+            "question": "La Giaconda is better known as what?",
+            "answer": "Mona Lisa",
+            "category": "2",
+            "difficulty": 2
+        },
+        {
+            "id": 2,
+            "question": "What is the heaviest organ in the human body?",
+            "answer": "The Liver",
+            "category": "1",
+            difficulty: 3
+        },
+        {
+            "id": 3,
+            "question": "Who is the best Soccer player of all time?",
+            "answer": "Ronaldo de Lima",
+            "category": "4",
+            difficulty: 3
+        },
+        ...
+    ],
+    "categories": [
+        {
+            "id": 1,
+            "type": "Science"
+        },
+        {
+            "id": 2,
+            "type": "Art"
+        },
+        {
+            "id": 3,
+            "type": "History"
+        },
+        {
+            "id": 4,
+            "type": "Sport"
+        },
+        ...
+    ],
+    "current_category": "Science", 
+    "total_questions": 30
+}
+```
+***GET /api/categories/<<int:category_id>>/questions***
+
+This returns a list of questions based on the specified category from the database. The results are paginated in groups of 10.
+
+**Sample Return**
+
+```
+    {
+    "success": True,
+    "questions": [
+        {
+            "id": 1,
+            "question": "La Giaconda is better known as what?",
+            "answer": "Mona Lisa",
+            "category": "2",
+            "difficulty": 2
+        },
+        {
+            "id": 2,
+            "question": "What is the heaviest organ in the human body?",
+            "answer": "The Liver",
+            "category": "1",
+            difficulty: 3
+        },
+        {
+            "id": 3,
+            "question": "Who is the best Soccer player of all time?",
+            "answer": "Ronaldo de Lima",
+            "category": "4",
+            difficulty: 3
+        },
+        ...
+    ],
+    "current_category": "Science", 
+    "total_questions": 30
+}
+```
+***GET /api/questions/<<int:question_id>>***
+
+This deletes the specified question from the database.
+
+**Sample Return**
+```
+{
+    "success": True,
+    "deleted": 2
+    "total_questions": 29
+}
+```
+
+***POST /api/questions***
+
+This creates a new question in the database.
+
+**Request Parameters**
+
+```
+    {
+        "question": "Which genre of music does coldplay perform?",
+        "answer": "alternative",
+        "category": "Entertainment",
+        "difficulty": 2,
+    }
+```
+
+**Sample Return**
+```
+{
+    "success": True,
+    "created": 31,
+    "total_question": 30
+
+}
+
+```
+***POST /api/quizzes***
+
+This creates a quiz and returns each question one at a time.
+
+**Sample Return**
+```
+{
+    "success": True,
+    "question": "What is the heaviest organ in the human body?"
+
+}
+
+```
+
+### Deployment N/A
+
+### Authors
+  Chisom Onwuchekwa
+
+### Acknowledgements
+
+Coach Caryn and the Udacity team.
