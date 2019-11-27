@@ -85,7 +85,6 @@ class QuestionView extends Component {
       data: JSON.stringify({searchTerm: searchTerm}),
       crossDomain: true,
       success: (result) => {
-        console.log(result)
         this.setState({
           questions: result.questions,
           totalQuestions: result.total_questions,
@@ -106,7 +105,6 @@ class QuestionView extends Component {
           url: `http://127.0.0.1:5000/api/questions/${id}`, //TODO: update request URL
           type: "DELETE",
           success: (result) => {
-            console.log(result)
             this.getQuestions();
           },
           error: (error) => {

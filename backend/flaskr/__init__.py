@@ -8,15 +8,20 @@ from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
 
+
 def paginate_questions(request, selection):
-  page = request.args.get('page', 1, type=int)
-  start =  (page - 1) * QUESTIONS_PER_PAGE
-  end = start + QUESTIONS_PER_PAGE
+    '''
+    paginate questions to return in 
+    groups of 10 at a time
+    '''
+    page = request.args.get('page', 1, type=int)
+    start =  (page - 1) * QUESTIONS_PER_PAGE
+    end = start + QUESTIONS_PER_PAGE
 
-  questions = [question.format() for question in selection]
-  current_questions = questions[start:end]
+    questions = [question.format() for question in selection]
+    current_questions = questions[start:end]
 
-  return current_questions
+    return current_questions
 
 def create_app(test_config=None):
     # create and configure the app
@@ -50,7 +55,7 @@ def create_app(test_config=None):
         except:
             abort(422)
 
-
+    # get all questions from db
     @app.route('/api/questions')
     def retrieve_questions():
         try:
@@ -69,15 +74,12 @@ def create_app(test_config=None):
         except:
             abort(422)
 
-    '''
-    @TODO: 
-    Create an endpoint to DELETE question using a question ID. 
 
-    TEST: When you click the trash icon next to a question, the question will be removed.
-    This removal will persist in the database and when you refresh the page. 
-    '''
     @app.route('/api/questions/<int:question_id>', methods=['DELETE'])
     def delete_question(question_id):
+        '''
+        deletes the specified question from the db
+        '''
         try:
             question = Question.query.filter(Question.id == question_id).one_or_none()
 
@@ -91,16 +93,7 @@ def create_app(test_config=None):
 
         except:
             abort(404)
-    '''
-    @TODO: 
-    Create an endpoint to POST a new question, 
-    which will require the question and answer text, 
-    category, and difficulty score.
-
-    TEST: When you submit a question on the "Add" tab, 
-    the form will clear and the question will appear at the end of the last page
-    of the questions list in the "List" tab.  
-    '''
+   
 
     @app.route('/api/questions', methods=['POST'])
     def create_question():
@@ -108,8 +101,11 @@ def create_app(test_config=None):
             body = request.get_json()
             search_term = body.get('searchTerm', None)
             if search_term is not None:
+                '''
+                return a list of questions that corresponds
+                to the serch term
+                '''
                 questions_selection = Question.query.filter(Question.question.ilike('%{}%'.format(search_term))).all()
-                # category = db.session.query(Category).first()
                 current_questions = paginate_questions(request, questions_selection)
                 categories = Category.query.all()
                 formatted_categories = [category.format() for category in categories]
@@ -121,6 +117,9 @@ def create_app(test_config=None):
                     'current_category': categories[0].format()
                 }), 200
             else:
+                '''
+                create a new question using the request params 
+                '''
                 question = body.get('question', None)
                 answer = body.get('answer', None)
                 difficulty = body.get('difficulty', None)
@@ -137,8 +136,13 @@ def create_app(test_config=None):
         except:
             abort(422)
 
+
     @app.route('/api/categories/<int:category_id>/questions')
     def get_questions_based_on_category(category_id):
+        '''
+        return a list of questions that corresponse
+        to the specified category
+        '''
         category = Category.query.get(category_id)
         if category is None:
             abort(404)
@@ -154,19 +158,13 @@ def create_app(test_config=None):
         except:
             abort(422)
 
-    '''
-    @TODO: 
-    Create a POST endpoint to get questions to play the quiz. 
-    This endpoint should take category and previous question parameters 
-    and return a random questions within the given category, 
-    if provided, and that is not one of the previous questions. 
-
-    TEST: In the "Play" tab, after a user selects "All" or a category,
-    one question at a time is displayed, the user is allowed to answer
-    and shown whether they were correct or not. 
-    '''
     @app.route('/api/quizzes', methods=['POST'])
     def get_quizzes():
+        '''
+        return questions based on the specified category if applicable.
+        questions returned previously are not repeated.
+        The questions are returned one at a time.
+        '''
         try:
             body = request.get_json()
             questions = Question.query.filter_by(
